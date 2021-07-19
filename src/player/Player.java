@@ -36,13 +36,13 @@ public class Player {
                 lock.lock();
 
                 while (busy) {
-                    condition.await();
+                    condition.await(); // playlist esta sendo modificada, threads em espera
                 }
 
-                busy = true;
+                busy = true; // comecando modificacao
                 playlist.addSongToPlaylist(song);
-                busy = false;
-                condition.signalAll();
+                busy = false; // terminando modificacao
+                condition.signalAll(); // liberando threads em espera
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -52,7 +52,7 @@ public class Player {
         }
     }
 
-    class removeSongThread extends Thread {
+    class removeSongThread extends Thread { // Utilizaremos o indice da musica na playlist para remover
         private final int  songIndex;
 
         public removeSongThread(int songIndex) {
@@ -64,13 +64,13 @@ public class Player {
                 lock.lock();
 
                 while (busy) {
-                    condition.await();
+                    condition.await(); // playlist esta sendo modificada, threads em espera
                 }
 
-                busy = true;
+                busy = true; // comecando modificacao
                 playlist.removeSongFromPlaylist(songIndex);
-                busy = false;
-                condition.signalAll();
+                busy = false; // terminando modificacao
+                condition.signalAll(); // liberando threads em espera
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
