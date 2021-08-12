@@ -1,44 +1,54 @@
 package player;
 
-import java.util.Random;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.ArrayList;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, UnsupportedAudioFileException, IOException, LineUnavailableException {
         Scanner in = new Scanner(System.in);
         Player player = new Player();
         String command = "";
+        boolean play = true;
 
         while(!command.equals("QUIT")){
+            System.out.println("\n\n\n 1: ADD \n 2: REMOVE \n 3: PLAY/PAUSE \n 4: PREV \n 5: NEXT \n 6: SHOW");
             command = in.nextLine();
 
             switch(command){
-                case "ADD":
-                    String title = in.nextLine();
-                    String artist = in.nextLine();
-                    String album = in.nextLine();
-                    double length = in.nextDouble();
-                    Song currSong = new Song(title,artist,album,length);
-                    player.initAdd(currSong);
-                    player.addThread.start();
+                case "1":
+                    int songPosFromSongFolder = in.nextInt();
+                    Song selectedSong = player.getSongs().get(songPosFromSongFolder);
+                    player.initAdd(selectedSong);
                     break;
-                case "REMOVE":
+                case "2":
                     int songPos = in.nextInt();
                     player.initRemove(songPos);
-                    player.removeThread.start();
                     break;
-                case "SHOW":
-                    player.getPlaylist().show();
+                case "3":
+                    player.initPlayPause(play);
+                    play = !play;
+                    break;
+                case "4":
+//                    player.initPrevSong();
+                    break;
+                case "5":
+//                    player.initNextSong();
+                    break;
+                case "6":
+//                    player.getPlaylist().show();
                     break;
             }
         }
-        player.addThread.join();
-        player.removeThread.join();
+        for(var entry : player.getMapThreads().entrySet()){
+            entry.getValue().join();
+        }
+//        player.getMapThreads().get("nextSongThread").join();
+//        player.getMapThreads().get("prevSongThread").join();
         in.close();
     }
 }
